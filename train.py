@@ -28,7 +28,6 @@ def train():
             cur_batch_size = len(real)
             # Flatten the image
             real = real.to(device)
-            print(real.shape)
             labels = labels.to(device)
 
             ### Update U-Net ###
