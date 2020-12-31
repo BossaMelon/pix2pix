@@ -25,6 +25,20 @@ def save_tensor_images(image_tensor, file_name, num_images=25, size=(1, 28, 28),
     plt.imsave(file_path, image_grid)
 
 
+def image_cat(*args, size, file_name, show=False):
+    image_list = []
+    for image in args:
+        image_unflat = image.detach().cpu().view(-1, *size)
+        image_grid = make_grid(image_unflat, nrow=4).permute(1, 2, 0).squeeze()
+        image_list.append(image_grid)
+    stacked_image = torch.cat(image_list,dim=0).numpy()
+    if show:
+        plt.imshow(stacked_image)
+        plt.show()
+        return
+    file_path = visualization_path / '{}.jpg'.format(file_name)
+    plt.imsave(file_path, stacked_image)
+
 
 
 def crop(image, new_shape):
