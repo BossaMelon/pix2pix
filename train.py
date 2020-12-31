@@ -4,7 +4,7 @@ from tqdm.auto import tqdm
 
 from dataloader import get_dataloader
 from models.unet import UNet
-from utils.util import show_tensor_images, crop, device
+from utils.util import device
 
 criterion = nn.BCEWithLogitsLoss()
 n_epochs = 200
@@ -21,11 +21,11 @@ def train():
     dataloader = get_dataloader()
     unet = UNet(input_dim, label_dim).to(device)
     unet_opt = torch.optim.Adam(unet.parameters(), lr=lr)
-    cur_step = 0
+
+    unet_loss = 0.
 
     for epoch in range(n_epochs):
         for real, labels in tqdm(dataloader):
-            cur_batch_size = len(real)
             # Flatten the image
             real = real.to(device)
             labels = labels.to(device)
@@ -37,15 +37,13 @@ def train():
             unet_loss.backward()
             unet_opt.step()
 
-            if cur_step % display_step == 0:
-                print(f"Epoch {epoch}: Step {cur_step}: U-Net loss: {unet_loss.item()}")
-                show_tensor_images(
-                    crop(real, torch.Size([len(real), 1, target_shape, target_shape])),
-                    size=(input_dim, target_shape, target_shape)
-                )
-                show_tensor_images(labels, size=(label_dim, target_shape, target_shape))
-                show_tensor_images(torch.sigmoid(pred), size=(label_dim, target_shape, target_shape))
-            cur_step += 1
+        print(f"Epoch {epoch}: U-Net loss: {unet_loss.item()}")
+        # show_tensor_images(
+        #     crop(real, torch.Size([len(real), 1, target_shape, target_shape])),
+        #     size=(input_dim, target_shape, target_shape)
+        # )
+        # show_tensor_images(labels, size=(label_dim, target_shape, target_shape))
+        # show_tensor_images(torch.sigmoid(pred), size=(label_dim, target_shape, target_shape))
 
 
 if __name__ == '__main__':
