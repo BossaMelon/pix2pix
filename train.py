@@ -4,7 +4,7 @@ from tqdm.auto import tqdm
 
 from dataloader import get_dataloader
 from models.unet import UNet
-from utils.util import device, save_tensor_images, crop, image_cat
+from utils.util import device, save_tensor_images, crop
 
 criterion = nn.BCEWithLogitsLoss()
 n_epochs = 200
@@ -38,14 +38,16 @@ def train():
             unet_opt.step()
 
         print(f"Epoch {epoch}: U-Net loss: {unet_loss.item():.4f}")
-
-        image_cat(
+        save_tensor_images(
             crop(real, torch.Size([len(real), 1, target_shape, target_shape])),
-            labels,
-            torch.sigmoid(pred),
             size=(input_dim, target_shape, target_shape),
-            file_name=f'unet-rlp-{epoch}'
+            file_name=f'unet-real-{epoch}'
         )
+        save_tensor_images(labels, size=(label_dim, target_shape, target_shape), file_name=f'unet-labels-{epoch}')
+
+        save_tensor_images(torch.sigmoid(pred), size=(label_dim, target_shape, target_shape),
+                           file_name=f'unet-pred-{epoch}')
+
 
 if __name__ == '__main__':
     train()

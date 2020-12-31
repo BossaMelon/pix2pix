@@ -13,7 +13,6 @@ def save_tensor_images(image_tensor, file_name, num_images=25, size=(1, 28, 28),
     Function for visualizing images: Given a tensor of images, number of images, and
     size per image, plots and prints the images in an uniform grid.
     """
-    # image_shifted = (image_tensor + 1) / 2
     image_shifted = image_tensor
     image_unflat = image_shifted.detach().cpu().view(-1, *size)
     image_grid = make_grid(image_unflat[:num_images], nrow=4).permute(1, 2, 0).squeeze().numpy()
@@ -39,6 +38,15 @@ def image_cat(*args, size, file_name, show=False):
     file_path = visualization_path / '{}.jpg'.format(file_name)
     plt.imsave(file_path, stacked_image)
 
+def image_cat(*args, size, file_name):
+    image_list = []
+    for image in args:
+        image_unflat = image.detach().cpu().view(-1, *size)
+        image_grid = make_grid(image_unflat, nrow=4).permute(1, 2, 0).squeeze().numpy()
+        image_list.append(image_grid)
+    stacked = torch.stack(image_list,dim=2)
+    print(stacked.shape)
+    return
 
 
 def crop(image, new_shape):
