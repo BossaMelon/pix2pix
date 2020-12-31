@@ -2,11 +2,13 @@ import matplotlib.pyplot as plt
 import torch
 from torchvision.utils import make_grid
 
+from utils.path_handle import visualization_path
+
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 device_name = 'cpu' if not torch.cuda.is_available() else torch.cuda.get_device_name()
 
 
-def show_tensor_images(image_tensor, num_images=25, size=(1, 28, 28)):
+def save_tensor_images(image_tensor, file_name, num_images=25, size=(1, 28, 28), show=False):
     """
     Function for visualizing images: Given a tensor of images, number of images, and
     size per image, plots and prints the images in an uniform grid.
@@ -14,9 +16,15 @@ def show_tensor_images(image_tensor, num_images=25, size=(1, 28, 28)):
     # image_shifted = (image_tensor + 1) / 2
     image_shifted = image_tensor
     image_unflat = image_shifted.detach().cpu().view(-1, *size)
-    image_grid = make_grid(image_unflat[:num_images], nrow=4)
-    plt.imshow(image_grid.permute(1, 2, 0).squeeze())
-    plt.show()
+    image_grid = make_grid(image_unflat[:num_images], nrow=4).permute(1, 2, 0).squeeze()
+    if show:
+        plt.imshow(image_grid)
+        plt.show()
+        return
+    file_path = visualization_path / '{}.jpg'.format(file_name)
+    plt.imsave(file_path, image_grid)
+
+
 
 
 def crop(image, new_shape):
