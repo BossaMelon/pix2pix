@@ -16,7 +16,7 @@ def save_tensor_images(image_tensor, file_name, num_images=25, size=(1, 28, 28),
     # image_shifted = (image_tensor + 1) / 2
     image_shifted = image_tensor
     image_unflat = image_shifted.detach().cpu().view(-1, *size)
-    image_grid = make_grid(image_unflat[:num_images], nrow=4).permute(1, 2, 0).squeeze()
+    image_grid = make_grid(image_unflat[:num_images], nrow=4).permute(1, 2, 0).squeeze().numpy()
     if show:
         plt.imshow(image_grid)
         plt.show()
